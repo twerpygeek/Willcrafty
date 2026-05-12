@@ -21,6 +21,9 @@ Then visit `http://localhost:4173`.
 - Download as print-to-PDF, Word-compatible `.doc`, or plain text
 - Beneficiary notification email drafts with acknowledgement checklist
 - Motion-powered animation via CDN, with graceful fallback
+- Animated onboarding walkthrough on the landing page
+- HyperFrames and Remotion source files in `video/` for rendering an onboarding MP4
+- Rendered onboarding video at `assets/willcrafty-onboarding.mp4`
 - Brand guidelines page at `brand-guidelines.html`
 
 ## Important Note

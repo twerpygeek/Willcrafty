@@ -5,6 +5,10 @@ import {
   toWordHtml,
   validateWill,
 } from "./willcrafty-core.mjs";
+import {
+  getOnboardingScene,
+  getOnboardingTimeline,
+} from "./onboarding-core.mjs";
 
 let motion = {};
 try {
@@ -30,6 +34,12 @@ const notifySubject = document.querySelector("#notifySubject");
 const notifyBody = document.querySelector("#notifyBody");
 const mailtoLink = document.querySelector("#mailtoLink");
 const acknowledged = new Set();
+const onboarding = {
+  index: 0,
+  paused: false,
+  timer: null,
+  secondsPerScene: 4,
+};
 
 let currentStep = 0;
 
@@ -79,6 +89,7 @@ renderRepeaters(starterWill);
 bindEvents();
 showStep(0);
 updateComputedPanels();
+initOnboarding();
 runAnimations();
 
 function bindEvents() {
@@ -117,6 +128,27 @@ function bindEvents() {
   document.querySelector("#downloadWord").addEventListener("click", () => downloadWill("doc"));
   document.querySelector("#downloadPdf").addEventListener("click", printWill);
 
+  document.querySelector("#onboardingReplay").addEventListener("click", () => {
+    onboarding.paused = false;
+    document.querySelector("#onboardingToggle").textContent = "Pause";
+    showOnboardingScene(0);
+    scheduleOnboarding();
+  });
+
+  document.querySelector("#onboardingToggle").addEventListener("click", () => {
+    onboarding.paused = !onboarding.paused;
+    document.querySelector("#onboardingToggle").textContent = onboarding.paused ? "Play" : "Pause";
+    if (onboarding.paused) clearTimeout(onboarding.timer);
+    else scheduleOnboarding();
+  });
+
+  document.querySelector("#sceneDots").addEventListener("click", (event) => {
+    const dot = event.target.closest("[data-scene-index]");
+    if (!dot) return;
+    showOnboardingScene(Number(dot.dataset.sceneIndex));
+    scheduleOnboarding();
+  });
+
   notificationList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-notify-index]");
     if (!button) return;
@@ -135,6 +167,53 @@ function bindEvents() {
     if (checkbox.checked) acknowledged.add(checkbox.dataset.ackIndex);
     else acknowledged.delete(checkbox.dataset.ackIndex);
   });
+}
+
+function initOnboarding() {
+  const dots = document.querySelector("#sceneDots");
+  const timeline = getOnboardingTimeline(onboarding.secondsPerScene);
+  dots.innerHTML = timeline.scenes
+    .map((scene, index) => {
+      return `<button type="button" data-scene-index="${index}" aria-label="${scene.title}"></button>`;
+    })
+    .join("");
+
+  showOnboardingScene(0);
+  scheduleOnboarding();
+}
+
+function showOnboardingScene(index) {
+  onboarding.index = index;
+  const scene = getOnboardingScene(index);
+  const stage = document.querySelector(".onboarding-stage");
+  const visual = document.querySelector("#motionVisual");
+
+  document.querySelector("#sceneKicker").textContent = scene.eyebrow;
+  document.querySelector("#sceneTitle").textContent = scene.title;
+  document.querySelector("#sceneCopy").textContent = scene.copy;
+  document.querySelector("#sceneMetric").textContent = scene.metric;
+  stage.dataset.scene = scene.id;
+  visual.style.setProperty("--scene-accent", scene.accent);
+
+  document.querySelectorAll("[data-scene-index]").forEach((dot, dotIndex) => {
+    dot.classList.toggle("active", dotIndex === index);
+  });
+
+  if (animate) {
+    animate(".motion-frame > *", { opacity: [0, 1], y: [18, 0] }, { duration: 0.48, delay: stagger(0.06) });
+    animate(".animated-device", { opacity: [0.4, 1], y: [28, 0], rotate: [-3, 0] }, { duration: 0.62 });
+    animate(".animated-document", { opacity: [0, 1], x: [36, 0], rotate: [5, 0] }, { duration: 0.62, delay: 0.1 });
+  }
+}
+
+function scheduleOnboarding() {
+  clearTimeout(onboarding.timer);
+  if (onboarding.paused) return;
+
+  onboarding.timer = setTimeout(() => {
+    showOnboardingScene(onboarding.index + 1);
+    scheduleOnboarding();
+  }, onboarding.secondsPerScene * 1000);
 }
 
 function showStep(nextStep) {

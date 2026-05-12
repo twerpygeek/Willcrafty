@@ -121,6 +121,54 @@
         </div>
       </section>
 
+      <section class="section onboarding-section" id="onboarding" data-animate>
+        <div class="onboarding-copy">
+          <p class="eyebrow">Animated walkthrough</p>
+          <h2>See WillCrafty in motion.</h2>
+          <p>
+            A short onboarding story that explains how the app guides you from simple answers to a private downloadable will draft.
+          </p>
+          <div class="onboarding-controls" aria-label="Onboarding animation controls">
+            <button class="button primary" type="button" id="onboardingReplay">Replay</button>
+            <button class="button secondary" type="button" id="onboardingToggle">Pause</button>
+            <a class="button secondary" href="assets/willcrafty-onboarding.mp4" target="_blank" rel="noreferrer">Open MP4</a>
+          </div>
+        </div>
+
+        <div class="onboarding-stage" aria-live="polite">
+          <div class="storyboard-strip" aria-hidden="true"></div>
+          <div class="motion-frame">
+            <div class="scene-kicker" id="sceneKicker">Step 1</div>
+            <h3 id="sceneTitle">Answer simple questions</h3>
+            <p id="sceneCopy"></p>
+            <strong id="sceneMetric"></strong>
+          </div>
+
+          <div class="motion-visual" id="motionVisual" aria-hidden="true">
+            <div class="orbit orbit-one"></div>
+            <div class="orbit orbit-two"></div>
+            <div class="animated-device">
+              <div class="device-top"></div>
+              <div class="device-line long"></div>
+              <div class="device-line"></div>
+              <div class="device-card-grid">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+            <div class="animated-document">
+              <span></span>
+              <i></i>
+              <i></i>
+              <i></i>
+            </div>
+          </div>
+
+          <div class="scene-dots" id="sceneDots" aria-label="Onboarding scenes"></div>
+        </div>
+      </section>
+
       <section class="section split-section" id="how-it-works" data-animate>
         <div class="section-media visual-card">
           <div class="step-stack">
