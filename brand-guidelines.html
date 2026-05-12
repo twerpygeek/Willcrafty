@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+      name="description"
+      content="WillCrafty brand guidelines for color, typography, logo usage, UI components, and motion."
+    >
+    <title>WillCrafty Brand Guidelines</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html#home" aria-label="WillCrafty home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <rect x="8" y="5" width="28" height="38" rx="8"></rect>
+            <path d="M18 26.5 23 31.5 34 18.5"></path>
+            <path d="M29 5v10h10"></path>
+            <path d="M15 16h9M15 22h5M15 36h15"></path>
+          </svg>
+        </span>
+        <span>WillCrafty</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="index.html#home">Home</a>
+        <a href="index.html#create">Create Will</a>
+        <a href="index.html#security">Security</a>
+        <a href="brand-guidelines.html">Brand</a>
+      </nav>
+    </header>
+
+    <main class="brand-guide">
+      <section class="section brand-guide-hero">
+        <p class="eyebrow">Brand guidelines</p>
+        <h1>Clear, calm, crafted.</h1>
+        <p class="hero-lede">
+          WillCrafty should feel like a trustworthy product that respects both the gravity of estate planning and the user’s desire to finish without friction.
+        </p>
+      </section>
+
+      <section class="section guide-grid">
+        <article class="guide-card">
+          <h2>Logo</h2>
+          <p>
+            The mark combines a document, checkmark, and folded corner. Use it with generous whitespace and keep it in Tiffany Blue whenever possible.
+          </p>
+          <div class="logo-showcase">
+            <span class="brand-mark large" aria-hidden="true">
+              <svg viewBox="0 0 48 48">
+                <rect x="8" y="5" width="28" height="38" rx="8"></rect>
+                <path d="M18 26.5 23 31.5 34 18.5"></path>
+                <path d="M29 5v10h10"></path>
+                <path d="M15 16h9M15 22h5M15 36h15"></path>
+              </svg>
+            </span>
+            <strong>WillCrafty</strong>
+          </div>
+        </article>
+
+        <article class="guide-card">
+          <h2>Color</h2>
+          <div class="swatches">
+            <span style="--swatch:#0ABAB5">Tiffany Blue<br>#0ABAB5</span>
+            <span style="--swatch:#102126">Deep Ink<br>#102126</span>
+            <span style="--swatch:#D9FBF8">Soft Mint<br>#D9FBF8</span>
+            <span style="--swatch:#FF7A59">Signal Coral<br>#FF7A59</span>
+          </div>
+        </article>
+
+        <article class="guide-card">
+          <h2>Typography</h2>
+          <p>
+            Use a modern system sans stack. Headlines are large, direct, and tightly spaced. Body copy stays plainspoken, readable, and never legalistic.
+          </p>
+          <div class="type-sample">
+            <strong>Your will, your way.</strong>
+            <span>Quick, clear, and completely free.</span>
+          </div>
+        </article>
+
+        <article class="guide-card">
+          <h2>Motion</h2>
+          <p>
+            Motion should feel cinematic but quiet: staggered reveals, floating document cards, progress movement, and short spring feedback. Avoid gimmicks.
+          </p>
+          <ul class="guide-list">
+            <li>Reveal sections upward over 650ms.</li>
+            <li>Use slow looping motion only on decorative previews.</li>
+            <li>Keep form transitions under 350ms.</li>
+            <li>Honor readable, calm pacing for a legal-adjacent task.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
