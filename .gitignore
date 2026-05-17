@@ -6,3 +6,4 @@ node_modules/
 video/remotion/node_modules/
 video/remotion/out/
 deployment-url.txt
+.vercel
