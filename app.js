@@ -9,6 +9,13 @@ import {
   getOnboardingScene,
   getOnboardingTimeline,
 } from "./onboarding-core.mjs";
+import {
+  createPlanLeadDraft,
+  formatPrice,
+  getPlanById,
+  getRecommendedPlan,
+  pricingPlans,
+} from "./monetization-core.mjs";
 
 let motion = {};
 try {
@@ -33,6 +40,13 @@ const notifyTo = document.querySelector("#notifyTo");
 const notifySubject = document.querySelector("#notifySubject");
 const notifyBody = document.querySelector("#notifyBody");
 const mailtoLink = document.querySelector("#mailtoLink");
+const planDialog = document.querySelector("#planDialog");
+const planDialogTitle = document.querySelector("#planDialogTitle");
+const planDialogSummary = document.querySelector("#planDialogSummary");
+const planLeadName = document.querySelector("#planLeadName");
+const planLeadEmail = document.querySelector("#planLeadEmail");
+const planLeadNotes = document.querySelector("#planLeadNotes");
+const planMailtoLink = document.querySelector("#planMailtoLink");
 const acknowledged = new Set();
 const onboarding = {
   index: 0,
@@ -42,6 +56,7 @@ const onboarding = {
 };
 
 let currentStep = 0;
+let selectedPlan = getPlanById("free");
 
 const repeaterConfig = {
   beneficiaries: {
@@ -86,6 +101,7 @@ const starterWill = {
 };
 
 renderRepeaters(starterWill);
+renderPricing();
 bindEvents();
 showStep(0);
 updateComputedPanels();
@@ -149,6 +165,22 @@ function bindEvents() {
     scheduleOnboarding();
   });
 
+  document.querySelector("#pricingGrid").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-plan-id]");
+    if (!button) return;
+    openPlanDialog(button.dataset.planId);
+  });
+
+  document.querySelector("#planRecommendation").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-plan-id]");
+    if (!button) return;
+    openPlanDialog(button.dataset.planId);
+  });
+
+  [planLeadName, planLeadEmail, planLeadNotes].forEach((field) => {
+    field.addEventListener("input", updatePlanMailto);
+  });
+
   notificationList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-notify-index]");
     if (!button) return;
@@ -167,6 +199,35 @@ function bindEvents() {
     if (checkbox.checked) acknowledged.add(checkbox.dataset.ackIndex);
     else acknowledged.delete(checkbox.dataset.ackIndex);
   });
+}
+
+function renderPricing() {
+  document.querySelector("#pricingGrid").innerHTML = pricingPlans
+    .map((plan) => {
+      const features = plan.features.map((feature) => `<li>${feature}</li>`).join("");
+      const badge = plan.highlighted ? `<span class="plan-badge">Recommended</span>` : "";
+
+      return `<article class="pricing-card ${plan.highlighted ? "highlighted" : ""}">
+        <div class="pricing-card-head">
+          <div>
+            <h3>${plan.name}</h3>
+            <p>${plan.tagline}</p>
+          </div>
+          ${badge}
+        </div>
+        <div class="plan-price">
+          <strong>${formatPrice(plan)}</strong>
+          <span>${plan.cadence}</span>
+        </div>
+        <p class="best-for">${plan.bestFor}</p>
+        <ul>${features}</ul>
+        <p class="plan-caveat">${plan.caveat}</p>
+        <button class="button ${plan.highlighted ? "primary" : "secondary"}" type="button" data-plan-id="${plan.id}">
+          ${plan.cta}
+        </button>
+      </article>`;
+    })
+    .join("");
 }
 
 function initOnboarding() {
@@ -330,6 +391,7 @@ function updateComputedPanels() {
 
   preview.textContent = documentText;
   renderValidation(result);
+  renderPlanRecommendation(will);
   renderNotifications(will);
   updateCompletion(will, result);
 }
@@ -341,6 +403,28 @@ function renderValidation(result) {
   }
 
   validationPanel.innerHTML = `<ul>${result.errors.map((error) => `<li>${error}</li>`).join("")}</ul>`;
+}
+
+function renderPlanRecommendation(will) {
+  const recommendation = getRecommendedPlan({
+    hasSpouseWill: will.beneficiaries.some((beneficiary) => /spouse|wife|husband|partner/i.test(beneficiary.relationship || "")),
+    beneficiaries: will.beneficiaries.filter((beneficiary) => beneficiary.fullName).length,
+    hasMinorChildren:
+      will.guardians.some((guardian) => guardian.fullName) ||
+      /minor|child|children|guardian/i.test(will.wishes || ""),
+    hasSpecificAssets: will.assets.some((asset) => asset.name),
+  });
+
+  const message =
+    recommendation.id === "free"
+      ? "Your draft looks suitable for the free self-help path. Upgrade only if you want a cleaner signing pack or review."
+      : `Recommended next step: ${recommendation.name} for ${formatPrice(recommendation)} ${recommendation.cadence}.`;
+
+  document.querySelector("#planRecommendation").innerHTML = `<div>
+    <strong>${message}</strong>
+    <p>${recommendation.bestFor}</p>
+    <button class="button small" type="button" data-plan-id="${recommendation.id}">${recommendation.cta}</button>
+  </div>`;
 }
 
 function renderNotifications(will) {
@@ -442,6 +526,41 @@ function openNotificationDraft(draft) {
   notifyBody.value = draft.body;
   mailtoLink.href = createMailto(draft);
   notifyDialog.showModal();
+}
+
+function openPlanDialog(planId) {
+  const will = readWill();
+  selectedPlan = getPlanById(planId);
+  planDialogTitle.textContent = selectedPlan.name;
+  planDialogSummary.textContent = `${formatPrice(selectedPlan)} ${selectedPlan.cadence} · ${selectedPlan.tagline}`;
+  planLeadName.value = will.testator.fullName || "";
+  planLeadEmail.value = will.executor.email || "";
+  planLeadNotes.value = buildPlanNotes(will, selectedPlan);
+  updatePlanMailto();
+  planDialog.showModal();
+}
+
+function updatePlanMailto() {
+  const draft = createPlanLeadDraft(selectedPlan, {
+    fullName: planLeadName.value,
+    email: planLeadEmail.value,
+    notes: planLeadNotes.value,
+  });
+  planMailtoLink.href = draft.mailto;
+}
+
+function buildPlanNotes(will, plan) {
+  const beneficiaryCount = will.beneficiaries.filter((beneficiary) => beneficiary.fullName).length;
+  const assetCount = will.assets.filter((asset) => asset.name).length;
+  const guardianCount = will.guardians.filter((guardian) => guardian.fullName).length;
+
+  return [
+    `I am interested in ${plan.name}.`,
+    `Beneficiaries listed: ${beneficiaryCount}`,
+    `Specific assets listed: ${assetCount}`,
+    `Guardians listed: ${guardianCount}`,
+    `Jurisdiction: ${will.testator.jurisdiction || "Not selected"}`,
+  ].join("\n");
 }
 
 function createMailto(draft) {

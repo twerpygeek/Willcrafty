@@ -28,6 +28,7 @@
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="#home">Home</a>
         <a href="#create">Create Will</a>
+        <a href="#pricing">Pricing</a>
         <a href="#security">Security</a>
         <a href="brand-guidelines.html">Brand</a>
       </nav>
@@ -217,6 +218,23 @@
         </div>
       </section>
 
+      <section class="section pricing-section" id="pricing" data-animate>
+        <div class="pricing-heading">
+          <p class="eyebrow">Simple monetisation</p>
+          <h2>Create free. Pay for confidence.</h2>
+          <p>
+            WillCrafty keeps the basic draft free, then charges only for execution support, human review, and family planning workflows.
+          </p>
+        </div>
+
+        <div class="pricing-grid" id="pricingGrid" aria-label="WillCrafty pricing plans"></div>
+
+        <div class="pricing-note">
+          <strong>No hidden catch.</strong>
+          <span>Custody, trust planning, payment checkout, and legal services require proper operations and professional review before launch.</span>
+        </div>
+      </section>
+
       <section class="section builder-section" id="create" data-animate>
         <div class="builder-heading">
           <a class="home-link" href="#home">Go to home page</a>
@@ -348,6 +366,7 @@
                 <button class="button secondary" type="button" id="downloadText">Download text</button>
               </div>
               <div class="validation-panel" id="validationPanel"></div>
+              <div class="plan-recommendation" id="planRecommendation"></div>
               <pre class="will-preview" id="willPreview" aria-label="Generated will preview"></pre>
               <div class="notify-panel">
                 <h4>Beneficiary notifications</h4>
@@ -382,6 +401,28 @@
         <p class="muted" id="notifyTo"></p>
         <textarea id="notifyBody" rows="12" readonly></textarea>
         <a class="button primary" id="mailtoLink" href="#">Open email app</a>
+      </form>
+    </dialog>
+
+    <dialog class="notify-dialog" id="planDialog">
+      <form method="dialog">
+        <button class="dialog-close" value="close" aria-label="Close plan request">×</button>
+        <p class="eyebrow">Plan request</p>
+        <h3 id="planDialogTitle"></h3>
+        <p class="muted" id="planDialogSummary"></p>
+        <label>
+          Your name
+          <input id="planLeadName" autocomplete="name" placeholder="Maya Tan">
+        </label>
+        <label>
+          Email
+          <input id="planLeadEmail" type="text" inputmode="email" autocomplete="email" placeholder="maya@example.com">
+        </label>
+        <label>
+          Notes
+          <textarea id="planLeadNotes" rows="5" placeholder="Tell us what you need help reviewing."></textarea>
+        </label>
+        <a class="button primary" id="planMailtoLink" href="#">Open request email</a>
       </form>
     </dialog>
 
