@@ -47,6 +47,8 @@ const planLeadName = document.querySelector("#planLeadName");
 const planLeadEmail = document.querySelector("#planLeadEmail");
 const planLeadNotes = document.querySelector("#planLeadNotes");
 const planMailtoLink = document.querySelector("#planMailtoLink");
+const planCheckoutButton = document.querySelector("#planCheckoutButton");
+const planCheckoutStatus = document.querySelector("#planCheckoutStatus");
 const acknowledged = new Set();
 const onboarding = {
   index: 0,
@@ -180,6 +182,8 @@ function bindEvents() {
   [planLeadName, planLeadEmail, planLeadNotes].forEach((field) => {
     field.addEventListener("input", updatePlanMailto);
   });
+
+  planCheckoutButton.addEventListener("click", requestPlanCheckout);
 
   notificationList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-notify-index]");
@@ -536,6 +540,9 @@ function openPlanDialog(planId) {
   planLeadName.value = will.testator.fullName || "";
   planLeadEmail.value = will.executor.email || "";
   planLeadNotes.value = buildPlanNotes(will, selectedPlan);
+  planCheckoutStatus.textContent = "";
+  planCheckoutButton.hidden = selectedPlan.price === 0;
+  planCheckoutButton.disabled = selectedPlan.price === 0;
   updatePlanMailto();
   planDialog.showModal();
 }
@@ -547,6 +554,36 @@ function updatePlanMailto() {
     notes: planLeadNotes.value,
   });
   planMailtoLink.href = draft.mailto;
+}
+
+async function requestPlanCheckout() {
+  if (!selectedPlan.price) return;
+
+  planCheckoutButton.disabled = true;
+  planCheckoutStatus.textContent = "Creating secure Stripe checkout...";
+
+  try {
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        planId: selectedPlan.id,
+        fullName: planLeadName.value,
+        email: planLeadEmail.value,
+        notes: planLeadNotes.value,
+      }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.checkoutUrl) {
+      throw new Error(payload.error || "checkout_failed");
+    }
+
+    window.location.href = payload.checkoutUrl;
+  } catch {
+    planCheckoutStatus.textContent = "Checkout is not available here. Use the request email fallback and we will follow up.";
+    planCheckoutButton.disabled = false;
+  }
 }
 
 function buildPlanNotes(will, plan) {

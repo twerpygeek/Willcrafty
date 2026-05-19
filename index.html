@@ -422,7 +422,11 @@
           Notes
           <textarea id="planLeadNotes" rows="5" placeholder="Tell us what you need help reviewing."></textarea>
         </label>
-        <a class="button primary" id="planMailtoLink" href="#">Open request email</a>
+        <div class="dialog-actions">
+          <button class="button primary" id="planCheckoutButton" type="button">Pay with Stripe</button>
+          <a class="button secondary" id="planMailtoLink" href="#">Open request email</a>
+        </div>
+        <p class="muted checkout-status" id="planCheckoutStatus" role="status"></p>
       </form>
     </dialog>
 

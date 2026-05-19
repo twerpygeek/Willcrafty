@@ -41,4 +41,10 @@ The app keeps basic drafting free and charges for support layers:
 - `Expert Review`: RM499+ human review intake
 - `Family Pack`: RM899+ two coordinated wills
 
-Current implementation creates an email lead request. Real checkout should be added only after Stripe or another payment provider is configured and review operations are ready.
+Paid plans use the Vercel serverless endpoint at `/api/checkout` to create one-time Stripe Checkout Sessions in MYR. The browser never receives the Stripe secret key.
+
+Required Vercel environment variable:
+
+- `STRIPE_SECRET_KEY`: Stripe restricted or secret key with Checkout Session creation access.
+
+The email lead request remains available as a fallback when checkout is not configured or when a user needs a custom review scope.

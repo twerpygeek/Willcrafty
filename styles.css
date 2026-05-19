@@ -279,6 +279,12 @@ h3 {
   color: var(--ink);
 }
 
+.button[disabled] {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
+
 .button.small {
   min-height: 40px;
   padding-inline: 14px;
@@ -1460,6 +1466,17 @@ textarea:focus {
   font-size: 1.4rem;
 }
 
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkout-status {
+  min-height: 1.4em;
+  margin: 0;
+}
+
 #notifyBody {
   min-height: 260px;
 }
@@ -1632,6 +1649,7 @@ textarea:focus {
   }
 
   .review-actions .button,
+  .dialog-actions .button,
   .form-controls .button {
     width: 100%;
   }
