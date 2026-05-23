@@ -16,6 +16,12 @@ import {
   getRecommendedPlan,
   pricingPlans,
 } from "./monetization-core.mjs";
+import {
+  getAnsweredAgentAnswerState,
+  getPendingAgentAnswerState,
+  getSetupAgentAnswerState,
+  renderAgentAnswer,
+} from "./agent-ui-core.mjs";
 
 let motion = {};
 try {
@@ -604,7 +610,7 @@ async function requestAgentAnswer(event) {
 
   agentSubmit.disabled = true;
   agentStatus.textContent = "Asking AI...";
-  agentAnswer.innerHTML = `<strong>Working on it</strong><p>Routing your question through the configured AI endpoint.</p>`;
+  renderAgentAnswer(document, agentAnswer, getPendingAgentAnswerState());
 
   try {
     const response = await fetch("/api/agent", {
@@ -618,12 +624,18 @@ async function requestAgentAnswer(event) {
       throw new Error(payload.error || "agent_failed");
     }
 
-    const routedVia = payload.routedVia ? `<span>Routed via ${escapeHtml(payload.routedVia)}</span>` : "";
     agentStatus.textContent = "Answered.";
-    agentAnswer.innerHTML = `<strong>WillCrafty AI</strong>${routedVia}<p>${escapeHtml(payload.answer)}</p>`;
+    renderAgentAnswer(
+      document,
+      agentAnswer,
+      getAnsweredAgentAnswerState({
+        answer: payload.answer,
+        routedVia: payload.routedVia,
+      }),
+    );
   } catch {
     agentStatus.textContent = "AI is not configured here yet.";
-    agentAnswer.innerHTML = `<strong>Setup needed</strong><p>Add FREELLMAPI_BASE_URL and FREELLMAPI_API_KEY in your deployment environment, then connect them to a running FreeLLMAPI proxy.</p>`;
+    renderAgentAnswer(document, agentAnswer, getSetupAgentAnswerState());
   } finally {
     agentSubmit.disabled = false;
   }
@@ -681,13 +693,6 @@ function escapeAttribute(value) {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }

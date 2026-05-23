@@ -80,3 +80,36 @@ test("isAllowedOrigin rejects cross-origin agent calls", () => {
     false,
   );
 });
+
+test("agent responses are marked no-store when the helper is not configured", async () => {
+  const req = {
+    method: "POST",
+    headers: {
+      origin: "https://willcrafty.vercel.app",
+      host: "willcrafty.vercel.app",
+    },
+    body: { question: "Can I name two executors?" },
+  };
+
+  const response = createMockResponse();
+  await agent(req, response);
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.headers["Content-Type"], "application/json; charset=utf-8");
+  assert.equal(response.headers["Cache-Control"], "no-store");
+  assert.deepEqual(response.json, { error: "agent_not_configured" });
+});
+
+function createMockResponse() {
+  return {
+    headers: {},
+    statusCode: 200,
+    setHeader(name, value) {
+      this.headers[name] = value;
+    },
+    end(body) {
+      this.body = body;
+      this.json = JSON.parse(body);
+    },
+  };
+}
