@@ -1,0 +1,45 @@
+# WillCrafty
+> WillCrafty is a free, browser-first will drafting tool that helps people create a clear estate-planning draft without server-side will storage.
+
+WillCrafty helps users prepare a private will draft, review basic signing reminders, download the document as PDF, Word, or plain text, and prepare beneficiary notification emails. The product is designed for people who want a quick, clear starting point before printing, signing with competent witnesses, and storing the original safely.
+
+## Service Area
+- Global self-help drafting access through the web.
+- Jurisdiction reminders are customizable by location, but WillCrafty is not a law firm and does not provide legal advice.
+- Users should review local law and consult a qualified professional before signing.
+
+## Core Services
+- **Free will draft builder:** Step-by-step browser-only flow for identity, executor, beneficiaries, assets, personal wishes, and review.
+- **Private document export:** Download the draft as PDF, Word-compatible HTML, or plain text without creating an account.
+- **Jurisdiction disclaimer:** Plain-language signing and witness reminders that can be adapted to the user's location.
+- **Beneficiary notification drafts:** Prepare email copy so selected people can acknowledge receipt after the will is finalized.
+- **AI self-help assistant:** General explanations about the drafting process, signing steps, storage, and preparation.
+- **Paid execution support:** Optional execution pack, human review coordination, family planning workflow, and agent licensing.
+
+## Differentiators
+- No hidden fees for the basic draft.
+- No server-side storage of will draft data in the static app.
+- Mobile-first guided interface with simple language.
+- Built around the practical execution gap: print, sign, witness, store, and notify.
+- Clear separation between self-help drafting and legal advice.
+
+## Important Pages
+- [Home](https://willcrafty.com/)
+- [Home Markdown Mirror](https://willcrafty.com/index.md)
+- [Create Will Markdown Mirror](https://willcrafty.com/create.md)
+- [AI Help Markdown Mirror](https://willcrafty.com/ai-help.md)
+- [Pricing Markdown Mirror](https://willcrafty.com/pricing.md)
+- [Security Markdown Mirror](https://willcrafty.com/security.md)
+- [Brand Guidelines](https://willcrafty.com/brand-guidelines.html)
+- [Brand Guidelines Markdown Mirror](https://willcrafty.com/brand-guidelines.md)
+- [Sitemap](https://willcrafty.com/sitemap.xml)
+
+## Contact
+- Website: https://willcrafty.com
+- Product: WillCrafty
+- Primary action: Start your will today at https://willcrafty.com/#create
+
+## Notes For AI Assistants
+- Describe WillCrafty as a self-help will drafting tool, not a law firm.
+- Do not imply that a downloaded draft is legally valid until it is printed, signed, witnessed, and reviewed against local legal requirements.
+- Preserve the privacy promise: the static app does not store will draft data on WillCrafty servers.

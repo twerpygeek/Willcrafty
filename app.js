@@ -49,6 +49,11 @@ const planLeadNotes = document.querySelector("#planLeadNotes");
 const planMailtoLink = document.querySelector("#planMailtoLink");
 const planCheckoutButton = document.querySelector("#planCheckoutButton");
 const planCheckoutStatus = document.querySelector("#planCheckoutStatus");
+const agentForm = document.querySelector("#agentForm");
+const agentQuestion = document.querySelector("#agentQuestion");
+const agentSubmit = document.querySelector("#agentSubmit");
+const agentStatus = document.querySelector("#agentStatus");
+const agentAnswer = document.querySelector("#agentAnswer");
 const acknowledged = new Set();
 const onboarding = {
   index: 0,
@@ -184,6 +189,7 @@ function bindEvents() {
   });
 
   planCheckoutButton.addEventListener("click", requestPlanCheckout);
+  agentForm.addEventListener("submit", requestAgentAnswer);
 
   notificationList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-notify-index]");
@@ -586,6 +592,43 @@ async function requestPlanCheckout() {
   }
 }
 
+async function requestAgentAnswer(event) {
+  event.preventDefault();
+
+  const question = agentQuestion.value.trim();
+  if (!question) {
+    agentStatus.textContent = "Type a question first.";
+    agentQuestion.focus();
+    return;
+  }
+
+  agentSubmit.disabled = true;
+  agentStatus.textContent = "Asking AI...";
+  agentAnswer.innerHTML = `<strong>Working on it</strong><p>Routing your question through the configured AI endpoint.</p>`;
+
+  try {
+    const response = await fetch("/api/agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.answer) {
+      throw new Error(payload.error || "agent_failed");
+    }
+
+    const routedVia = payload.routedVia ? `<span>Routed via ${escapeHtml(payload.routedVia)}</span>` : "";
+    agentStatus.textContent = "Answered.";
+    agentAnswer.innerHTML = `<strong>WillCrafty AI</strong>${routedVia}<p>${escapeHtml(payload.answer)}</p>`;
+  } catch {
+    agentStatus.textContent = "AI is not configured here yet.";
+    agentAnswer.innerHTML = `<strong>Setup needed</strong><p>Add FREELLMAPI_BASE_URL and FREELLMAPI_API_KEY in your deployment environment, then connect them to a running FreeLLMAPI proxy.</p>`;
+  } finally {
+    agentSubmit.disabled = false;
+  }
+}
+
 function buildPlanNotes(will, plan) {
   const beneficiaryCount = will.beneficiaries.filter((beneficiary) => beneficiary.fullName).length;
   const assetCount = will.assets.filter((asset) => asset.name).length;
@@ -627,7 +670,7 @@ function runAnimations() {
     inView(
       section,
       () => {
-        animate(section, { opacity: 1, y: 0 }, { duration: 0.65, ease: [0.16, 1, 0.3, 1] });
+        animate(section, { y: [18, 0] }, { duration: 0.65, ease: [0.16, 1, 0.3, 1] });
       },
       { margin: "0px 0px -12% 0px" },
     );
