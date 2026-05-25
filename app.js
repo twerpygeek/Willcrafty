@@ -24,7 +24,10 @@ import {
 } from "./agent-ui-core.mjs";
 import {
   renderNotificationList,
+  renderPricingGrid,
   renderPlanRecommendation as renderPlanRecommendationPanel,
+  renderRepeaterCards,
+  renderSceneDots,
   renderValidationPanel,
 } from "./willcrafty-ui-core.mjs";
 
@@ -223,42 +226,13 @@ function bindEvents() {
 }
 
 function renderPricing() {
-  document.querySelector("#pricingGrid").innerHTML = pricingPlans
-    .map((plan) => {
-      const features = plan.features.map((feature) => `<li>${feature}</li>`).join("");
-      const badge = plan.highlighted ? `<span class="plan-badge">Recommended</span>` : "";
-
-      return `<article class="pricing-card ${plan.highlighted ? "highlighted" : ""}">
-        <div class="pricing-card-head">
-          <div>
-            <h3>${plan.name}</h3>
-            <p>${plan.tagline}</p>
-          </div>
-          ${badge}
-        </div>
-        <div class="plan-price">
-          <strong>${formatPrice(plan)}</strong>
-          <span>${plan.cadence}</span>
-        </div>
-        <p class="best-for">${plan.bestFor}</p>
-        <ul>${features}</ul>
-        <p class="plan-caveat">${plan.caveat}</p>
-        <button class="button ${plan.highlighted ? "primary" : "secondary"}" type="button" data-plan-id="${plan.id}">
-          ${plan.cta}
-        </button>
-      </article>`;
-    })
-    .join("");
+  renderPricingGrid(document, document.querySelector("#pricingGrid"), pricingPlans, formatPrice);
 }
 
 function initOnboarding() {
   const dots = document.querySelector("#sceneDots");
   const timeline = getOnboardingTimeline(onboarding.secondsPerScene);
-  dots.innerHTML = timeline.scenes
-    .map((scene, index) => {
-      return `<button type="button" data-scene-index="${index}" aria-label="${scene.title}"></button>`;
-    })
-    .join("");
+  renderSceneDots(document, dots, timeline.scenes);
 
   showOnboardingScene(0);
   scheduleOnboarding();
@@ -339,9 +313,7 @@ function renderRepeaters(will) {
     const rows = will[type] || [];
     const config = repeaterConfig[type];
 
-    container.innerHTML = rows
-      .map((row, rowIndex) => renderRepeaterCard(type, row, rowIndex, config))
-      .join("");
+    renderRepeaterCards(document, container, type, rows, config);
 
     container.querySelectorAll("[data-remove-row]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -349,33 +321,6 @@ function renderRepeaters(will) {
       });
     });
   }
-}
-
-function renderRepeaterCard(type, row, rowIndex, config) {
-  const fields = config.rows
-    .map(([key, label, placeholder, inputType]) => {
-      const value = escapeAttribute(row[key] ?? "");
-      const typeAttribute =
-        inputType === "number"
-          ? 'type="text" inputmode="decimal" pattern="[0-9]*"'
-          : inputType === "email"
-            ? 'type="text" inputmode="email"'
-            : `type="${inputType}"`;
-
-      return `<label>
-        ${label}
-        <input name="${type}.${rowIndex}.${key}" ${typeAttribute} placeholder="${placeholder}" value="${value}">
-      </label>`;
-    })
-    .join("");
-
-  return `<article class="repeat-card">
-    <div class="repeat-card-header">
-      <strong>${config.label} ${rowIndex + 1}</strong>
-      <button class="remove-row" type="button" data-remove-row="${rowIndex}">Remove</button>
-    </div>
-    <div class="field-grid">${fields}</div>
-  </article>`;
 }
 
 function readWill() {
@@ -658,12 +603,4 @@ function runAnimations() {
       { margin: "0px 0px -12% 0px" },
     );
   });
-}
-
-function escapeAttribute(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
 }

@@ -77,6 +77,7 @@ The root discovery layer is designed for crawlers, search engines, and AI assist
 - `index.html`: includes JSON-LD for Organization, WebSite, SoftwareApplication, Service, and FAQPage.
 
 Vercel and Netlify configs set Markdown and discovery files to crawlable plain text where supported.
+They should also mirror the same static security baseline: CSP, `X-Frame-Options: DENY`, and `Cross-Origin-Opener-Policy: same-origin`. The CSP still permits `style-src 'unsafe-inline'` until inline brand-guideline swatches are removed.
 
 ## Superpowers Subagents
 

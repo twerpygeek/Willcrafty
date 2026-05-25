@@ -49,3 +49,36 @@ test("isAllowedOrigin rejects cross-origin checkout attempts", () => {
     false,
   );
 });
+
+test("checkout responses are marked no-store when Stripe is not configured", async () => {
+  const req = {
+    method: "POST",
+    headers: {
+      origin: "https://willcrafty.vercel.app",
+      host: "willcrafty.vercel.app",
+    },
+    body: { planId: "plus" },
+  };
+
+  const response = createMockResponse();
+  await checkout(req, response);
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.headers["Content-Type"], "application/json; charset=utf-8");
+  assert.equal(response.headers["Cache-Control"], "no-store");
+  assert.deepEqual(response.json, { error: "checkout_not_configured" });
+});
+
+function createMockResponse() {
+  return {
+    headers: {},
+    statusCode: 200,
+    setHeader(name, value) {
+      this.headers[name] = value;
+    },
+    end(body) {
+      this.body = body;
+      this.json = JSON.parse(body);
+    },
+  };
+}
