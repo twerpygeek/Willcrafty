@@ -22,6 +22,11 @@ import {
   getSetupAgentAnswerState,
   renderAgentAnswer,
 } from "./agent-ui-core.mjs";
+import {
+  renderNotificationList,
+  renderPlanRecommendation as renderPlanRecommendationPanel,
+  renderValidationPanel,
+} from "./willcrafty-ui-core.mjs";
 
 let motion = {};
 try {
@@ -413,12 +418,7 @@ function updateComputedPanels() {
 }
 
 function renderValidation(result) {
-  if (result.isValid) {
-    validationPanel.innerHTML = `<p class="valid">Your draft has the required sections. Review carefully before signing.</p>`;
-    return;
-  }
-
-  validationPanel.innerHTML = `<ul>${result.errors.map((error) => `<li>${error}</li>`).join("")}</ul>`;
+  renderValidationPanel(document, validationPanel, result);
 }
 
 function renderPlanRecommendation(will) {
@@ -431,45 +431,16 @@ function renderPlanRecommendation(will) {
     hasSpecificAssets: will.assets.some((asset) => asset.name),
   });
 
-  const message =
-    recommendation.id === "free"
-      ? "Your draft looks suitable for the free self-help path. Upgrade only if you want a cleaner signing pack or review."
-      : `Recommended next step: ${recommendation.name} for ${formatPrice(recommendation)} ${recommendation.cadence}.`;
-
-  document.querySelector("#planRecommendation").innerHTML = `<div>
-    <strong>${message}</strong>
-    <p>${recommendation.bestFor}</p>
-    <button class="button small" type="button" data-plan-id="${recommendation.id}">${recommendation.cta}</button>
-  </div>`;
+  renderPlanRecommendationPanel(document, document.querySelector("#planRecommendation"), {
+    ...recommendation,
+    priceLabel: formatPrice(recommendation),
+  });
 }
 
 function renderNotifications(will) {
   const beneficiaries = will.beneficiaries.filter((beneficiary) => beneficiary.fullName || beneficiary.email);
 
-  if (beneficiaries.length === 0) {
-    notificationList.innerHTML = `<p class="muted">Add beneficiaries to prepare notification drafts.</p>`;
-    return;
-  }
-
-  notificationList.innerHTML = `<div class="notify-list">
-    ${beneficiaries
-      .map((beneficiary, index) => {
-        const email = beneficiary.email || "No email yet";
-        const checked = acknowledged.has(String(index)) ? "checked" : "";
-        return `<div class="notify-row">
-          <div>
-            <strong>${escapeHtml(beneficiary.fullName || `Beneficiary ${index + 1}`)}</strong><br>
-            <span>${escapeHtml(email)}</span>
-          </div>
-          <label>
-            <input data-ack-index="${index}" type="checkbox" ${checked}>
-            Acknowledged
-          </label>
-          <button class="button small" type="button" data-notify-index="${index}">Prepare email</button>
-        </div>`;
-      })
-      .join("")}
-  </div>`;
+  renderNotificationList(document, notificationList, beneficiaries, acknowledged);
 }
 
 function updateCompletion(will, validationResult) {
